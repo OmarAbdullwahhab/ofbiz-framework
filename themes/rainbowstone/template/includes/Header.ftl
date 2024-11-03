@@ -99,4 +99,5 @@ under the License.
     </#list>
       </script>
 </#if>
+<script src="https://unpkg.com/htmx.org@2.0.3"></script>
 </head>
