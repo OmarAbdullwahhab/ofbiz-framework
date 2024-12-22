@@ -25,8 +25,6 @@ import java.util.List;
 
 import org.apache.commons.lang.RandomStringUtils;
 import org.apache.ofbiz.base.util.Debug;
-import org.apache.ofbiz.base.util.GeneralException;
-import org.apache.ofbiz.base.util.GroovyUtil;
 import org.apache.ofbiz.base.util.ObjectType;
 import org.apache.ofbiz.base.util.UtilGenerics;
 import org.apache.ofbiz.base.util.UtilMisc;
@@ -105,14 +103,6 @@ public class ModelTestSuite {
             } catch (Exception e) {
                 String errMsg = "Unable to load test suite class : " + className;
                 Debug.logError(e, errMsg, MODULE);
-            }
-        } else if ("groovy-test-suite".equals(nodeName)) {
-            try {
-                Class<? extends TestCase> testClass =
-                        UtilGenerics.cast(GroovyUtil.getScriptClassFromLocation(testElement.getAttribute("location")));
-                this.testList.add(new TestSuite(testClass, testElement.getAttribute("name")));
-            } catch (GeneralException e) {
-                Debug.logError(e, MODULE);
             }
         } else if ("service-test".equals(nodeName)) {
             this.testList.add(new ServiceTest(caseName, testElement));

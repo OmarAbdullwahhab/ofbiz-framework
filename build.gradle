@@ -23,20 +23,21 @@ import org.asciidoctor.gradle.jvm.AsciidoctorTask
  * Project setup
  * ======================================================== */
 plugins {
-    id 'application'
+    id 'application' // plugins that are versioned as part of Gradle are using simple quotes to differentiate them
     id 'groovy'
     id 'eclipse'
     id 'checkstyle'
     id 'codenarc'
     id 'maven-publish'
-    id 'org.asciidoctor.jvm.convert' version '4.0.2'
-    id 'org.asciidoctor.jvm.pdf' version '4.0.2'
-    id 'org.owasp.dependencycheck' version '10.0.2' apply false
-    id 'se.patrikerdes.use-latest-versions' version '0.2.18' apply false
-    id 'com.github.ben-manes.versions' version '0.51.0' apply false
-    id "com.github.ManifestClasspath" version "0.1.0-RELEASE"
-    id "com.github.jakemarsden.git-hooks" version "0.0.2"
-    id "com.github.node-gradle.node" version '7.0.2' apply false
+    id "org.asciidoctor.jvm.convert" version "latest.release"
+    id "org.asciidoctor.jvm.pdf" version "latest.release"
+    id "org.owasp.dependencycheck" version "latest.release" apply false
+    //id 'se.patrikerdes.use-latest-versions' version '0.2.18' apply false
+    id "se.patrikerdes.use-latest-versions"  version "latest.release" apply false
+    id "com.github.ben-manes.versions" version "latest.release" apply false
+    id "com.github.ManifestClasspath" version "latest.release"
+    id "com.github.jakemarsden.git-hooks" version "latest.release"
+    id "com.github.node-gradle.node" version "latest.release" apply false
 }
 
 /* OWASP plugin
@@ -70,6 +71,43 @@ if (project.hasProperty('enableDependencyUpdates')) {
     apply plugin: 'com.github.ben-manes.versions'
     apply plugin: 'se.patrikerdes.use-latest-versions'
 }
+
+/* Configuration and default values. By default not available as it breacks Gradle build even when useLatestVersionsCheck (see above) is used.
+useLatestVersions {
+   // A whitelist of dependencies to update, in the format of group:name
+   // Equal to command line: --update-dependency=[values]
+   updateWhitelist = []
+   // A blacklist of dependencies to update, in the format of group:name
+   // Equal to command line: --ignore-dependency=[values]
+   updateBlacklist = []
+   // When enabled, root project gradle.properties will also be populated with
+   // versions from subprojects in multi-project build
+   // Equal to command line: --update-root-properties
+   updateRootProperties = false
+   // By default plugin tries to find all relevant gradle files (e.g. *.gradle, gradle.properties etc).
+   // This can be slow in some cases when project has a lot of gradle files. For example when using conventions
+   // in buildSrc. With this option you can specify what files should plugin search and check. Plugin will ignore
+   // files that don't exist. Empty list means use default strategy. File paths are relative to project dir.
+   //
+   // Example:
+   // versionFiles = ["gradle.build", "gradle.properties"]
+   // Will check just $projectDir/gradle.build and $projectDir/gradle.properties
+   //
+   // Note:
+   // You always have to specify file that has dependencies in some common dependency format with artifact coordinates,
+   // e.g. compileOnly "group:module:version" or compileOnly("group:module:version") or val dependency = "group:module:version" etc.
+   // For example if you set just versionFiles = ["gradle.properties"] this won't work, since plugin
+   // won't be able to correlate variable with artifact coordinates.
+   //
+   // Equal to command line: --version-files=[values]
+   versionFiles = []
+   // List of root project files to update when updateRootProperties is enabled.
+   // `build.gradle` is not an acceptable entry here as it breaks other expected
+   // functionality. Version variables in `build.gradle` need to be moved into
+   // a separate file which can be listed here.
+   // Equal to command line: --root-version-files=[values]
+   //rootVersionFiles = ['gradle.properties']
+}*/
 
 apply from: 'common.gradle'
 apply from: 'dependencies.gradle'
@@ -218,7 +256,7 @@ dependencies {
     }
 
     junitReport 'junit:junit:4.13.2'
-    junitReport 'org.apache.ant:ant-junit:1.10.14'
+    junitReport 'org.apache.ant:ant-junit:1.10.15'
 
     // Libraries downloaded manually
     implementation fileTree(dir: file("${rootDir}/lib"), include: '**/*.jar')
@@ -295,7 +333,7 @@ checkstyle {
     // Currently there are no errors so we can show new one when they appear
     showViolations = true
     // Specify tool version so we can keep it up-to-date
-    toolVersion = '10.17.0'
+    toolVersion = '10.20.2'
 }
 gitHooks {
     hooks = ['pre-push': 'checkstyleMain codenarcMain codenarcTest']

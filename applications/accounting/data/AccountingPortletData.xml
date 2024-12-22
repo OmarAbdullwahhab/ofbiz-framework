@@ -92,7 +92,6 @@
     <PortalPage portalPageId="ACC_MAIN" portalPageName="Accounting Main Page" description="The main portal page of the Accounting application" ownerUserLoginId="_NA_" sequenceNum="1"/>
     <PortalPageColumn columnSeqId="00001" portalPageId="ACC_MAIN"/>
     <PortalPageColumn columnSeqId="00002" portalPageId="ACC_MAIN"/>
-    <!-- Beware the loading order is defined below and should not be changed because invoiceTypeId is needed for each type, see OFBIZ-13166-->
     <PortalPagePortlet columnSeqId="00001" portalPageId="ACC_MAIN" portalPortletId="InvoiceArPastDue" portletSeqId="00001" sequenceNum="1"/>
     <PortalPagePortlet columnSeqId="00001" portalPageId="ACC_MAIN" portalPortletId="InvoiceArDueSoon" portletSeqId="00002" sequenceNum="2"/>
     <PortalPagePortlet columnSeqId="00002" portalPageId="ACC_MAIN" portalPortletId="InvoiceApPastDue" portletSeqId="00003" sequenceNum="1"/>

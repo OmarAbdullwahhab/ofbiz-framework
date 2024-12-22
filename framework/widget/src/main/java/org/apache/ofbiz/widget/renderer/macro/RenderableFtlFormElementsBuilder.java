@@ -108,16 +108,13 @@ public final class RenderableFtlFormElementsBuilder {
 
     public RenderableFtl asterisks(final Map<String, Object> context, final ModelFormField modelFormField) {
         String requiredField = "false";
-        String requiredStyle = "";
         if (modelFormField.getRequiredField()) {
             requiredField = "true";
-            requiredStyle = modelFormField.getRequiredFieldStyle();
         }
 
         return RenderableFtlMacroCall.builder()
                 .name("renderAsterisks")
                 .stringParameter("requiredField", requiredField)
-                .stringParameter("requiredStyle", requiredStyle)
                 .build();
     }
 
@@ -156,7 +153,7 @@ public final class RenderableFtlFormElementsBuilder {
         boolean ajaxEnabled = inPlaceEditor != null && javaScriptEnabled;
         if (UtilValidate.isNotEmpty(description) && size > 0 && description.length() > size) {
             title = description;
-            description = description.substring(0, size - 8) + "..." + description.substring(description.length() - 5);
+            description = StringUtil.truncateEncodedStringToLength(description, size);
         }
 
         final RenderableFtlMacroCallBuilder builder = RenderableFtlMacroCall.builder()
@@ -253,12 +250,20 @@ public final class RenderableFtlFormElementsBuilder {
                                    final boolean javaScriptEnabled) {
         ModelFormField modelFormField = textField.getModelFormField();
         String name = modelFormField.getParameterName(context);
-        String className = "";
+        String type = textField.getType();
+        if (UtilValidate.isEmpty(type)) {
+            type = "text";
+        }
+        String pattern = "";
+        if (List.of("text", "email", "url", "tel").contains(type)) {
+            pattern = textField.getPattern();
+        }
+        List<String> classes = new ArrayList<>();
         String alert = "false";
         String mask = "";
         String placeholder = textField.getPlaceholder(context);
         if (UtilValidate.isNotEmpty(modelFormField.getWidgetStyle())) {
-            className = modelFormField.getWidgetStyle();
+            classes.add(modelFormField.getWidgetStyle());
             if (modelFormField.shouldBeRed(context)) {
                 alert = "true";
             }
@@ -275,14 +280,13 @@ public final class RenderableFtlFormElementsBuilder {
         String clientAutocomplete = "false";
         //check for required field style on single forms
         if ("single".equals(modelFormField.getModelForm().getType()) && modelFormField.getRequiredField()) {
+            // kept for backward compatibility with existing CSS/JS
+            // maybe unused if jQuery Validation is no longer used
+            // for styling we should rely on "required" attribute
+            classes.add("required");
             String requiredStyle = modelFormField.getRequiredFieldStyle();
-            if (UtilValidate.isEmpty(requiredStyle)) {
-                requiredStyle = "required";
-            }
-            if (UtilValidate.isEmpty(className)) {
-                className = requiredStyle;
-            } else {
-                className = requiredStyle + " " + className;
+            if (UtilValidate.isNotEmpty(requiredStyle)) {
+                classes.add(requiredStyle);
             }
         }
         List<ModelForm.UpdateArea> updateAreas = modelFormField.getOnChangeUpdateAreas();
@@ -301,7 +305,9 @@ public final class RenderableFtlFormElementsBuilder {
         return RenderableFtlMacroCall.builder()
                 .name("renderTextField")
                 .stringParameter("name", name)
-                .stringParameter("className", className)
+                .stringParameter("className", String.join(" ", classes))
+                .stringParameter("type", type)
+                .stringParameter("pattern", pattern)
                 .stringParameter("alert", alert)
                 .stringParameter("value", value)
                 .stringParameter("textSize", textSize)
@@ -311,6 +317,7 @@ public final class RenderableFtlFormElementsBuilder {
                 .stringParameter("action", action != null ? action : "")
                 .booleanParameter("disabled", disabled)
                 .booleanParameter("readonly", readonly)
+                .booleanParameter("required", modelFormField.getRequiredField())
                 .stringParameter("clientAutocomplete", clientAutocomplete)
                 .stringParameter("ajaxUrl", ajaxUrl)
                 .booleanParameter("ajaxEnabled", ajaxEnabled)
@@ -798,7 +805,7 @@ public final class RenderableFtlFormElementsBuilder {
             }
             if (UtilValidate.isNotEmpty(description) && size > 0 && description.length() > size) {
                 title = description;
-                description = description.substring(0, size) + "…";
+                description = StringUtil.truncateEncodedStringToLength(description, size);
             } else if (UtilValidate.isNotEmpty(request.getAttribute("title"))) {
                 title = request.getAttribute("title").toString();
             }
@@ -1162,7 +1169,7 @@ public final class RenderableFtlFormElementsBuilder {
 
     private String truncate(String value, int maxCharacterLength) {
         if (maxCharacterLength > 8 && value.length() > maxCharacterLength) {
-            return value.substring(0, maxCharacterLength - 8) + "..." + value.substring(value.length() - 5);
+            return StringUtil.truncateEncodedStringToLength(value, maxCharacterLength);
         }
         return value;
     }

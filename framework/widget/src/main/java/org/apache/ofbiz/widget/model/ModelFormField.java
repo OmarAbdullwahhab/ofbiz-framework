@@ -5441,12 +5441,16 @@ public final class ModelFormField {
         private final boolean readonly;
         private final int size;
         private final SubHyperlink subHyperlink;
+        private final String type;
+        private final String pattern;
 
         public TextField(Element element, ModelFormField modelFormField) {
             super(element, modelFormField);
             this.clientAutocompleteField = !"false".equals(element.getAttribute("client-autocomplete-field"));
             this.defaultValue = FlexibleStringExpander.getInstance(element.getAttribute("default-value"));
             this.mask = element.getAttribute("mask");
+            this.type = element.getAttribute("type");
+            this.pattern = element.getAttribute("pattern");
             Integer maxlength = null;
             String maxlengthStr = element.getAttribute("maxlength");
             if (!maxlengthStr.isEmpty()) {
@@ -5484,6 +5488,8 @@ public final class ModelFormField {
             this.clientAutocompleteField = true;
             this.defaultValue = FlexibleStringExpander.getInstance("");
             this.mask = "";
+            this.type = "";
+            this.pattern = "";
             this.maxlength = maxlength;
             this.placeholder = FlexibleStringExpander.getInstance("");
             this.readonly = false;
@@ -5491,11 +5497,13 @@ public final class ModelFormField {
             this.subHyperlink = null;
         }
 
-        protected TextField(int fieldSource, int size, Integer maxlength, ModelFormField modelFormField) {
+        protected TextField(int fieldSource, int size, Integer maxlength, String type, ModelFormField modelFormField) {
             super(fieldSource, FieldInfo.TEXT, modelFormField);
             this.clientAutocompleteField = true;
             this.defaultValue = FlexibleStringExpander.getInstance("");
             this.mask = "";
+            this.type = type;
+            this.pattern = "";
             this.maxlength = maxlength;
             this.placeholder = FlexibleStringExpander.getInstance("");
             this.readonly = false;
@@ -5508,6 +5516,8 @@ public final class ModelFormField {
             this.clientAutocompleteField = true;
             this.defaultValue = FlexibleStringExpander.getInstance("");
             this.mask = "";
+            this.type = "";
+            this.pattern = "";
             this.maxlength = null;
             this.placeholder = FlexibleStringExpander.getInstance("");
             this.readonly = false;
@@ -5528,6 +5538,8 @@ public final class ModelFormField {
             this.clientAutocompleteField = original.clientAutocompleteField;
             this.defaultValue = original.defaultValue;
             this.mask = original.mask;
+            this.type = original.type;
+            this.pattern = original.pattern;
             this.placeholder = original.placeholder;
             this.size = original.size;
             this.maxlength = original.maxlength;
@@ -5639,6 +5651,22 @@ public final class ModelFormField {
                 throws IOException {
             formStringRenderer.renderTextField(writer, context, this);
         }
+
+        /**
+         * Gets type.
+         * @return the type
+         */
+        public String getType() {
+            return this.type;
+        }
+
+        /**
+         * Gets pattern.
+         * @return the pattern
+         */
+        public String getPattern() {
+            return this.pattern;
+        }
     }
 
     /**
@@ -5666,7 +5694,7 @@ public final class ModelFormField {
         }
 
         public TextFindField(int fieldSource, int size, Integer maxlength, ModelFormField modelFormField) {
-            super(fieldSource, size, maxlength, modelFormField);
+            super(fieldSource, size, maxlength, "", modelFormField);
             this.defaultOption = UtilProperties.getPropertyValue("widget", "widget.form.defaultTextFindOption", "contains");
             this.hideIgnoreCase = false;
             this.hideOptions = false;

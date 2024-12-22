@@ -361,7 +361,7 @@ under the License.
         <section>
            <actions>
                 <property-map resource="AccountingUiLabels" map-name="uiLabelMap" global="true"/>
-                <!-- <set field="invoiceTypeId" value="SALES_INVOICE"/> -->
+                <set field="invoiceTypeId" value="SALES_INVOICE"/>
                 <set field="organizationPartyId" from-field="organizationPartyId" default-value="${defaultOrganizationPartyId}"/>
                 <script location="component://accounting/src/main/groovy/org/apache/ofbiz/accounting/invoice/InvoiceReport.groovy"/>
                 <set field="invoices" from-field="InvoicesDueSoon"/>
@@ -393,7 +393,7 @@ under the License.
         <section>
            <actions>
                 <property-map resource="AccountingUiLabels" map-name="uiLabelMap" global="true"/>
-                <!-- <set field="invoiceTypeId" value="PURCHASE_INVOICE"/> -->
+                <set field="invoiceTypeId" value="PURCHASE_INVOICE"/>
                 <set field="organizationPartyId" from-field="organizationPartyId" default-value="${defaultOrganizationPartyId}"/>
                 <script location="component://accounting/src/main/groovy/org/apache/ofbiz/accounting/invoice/InvoiceReport.groovy"/>
                 <set field="invoices" from-field="InvoicesDueSoon"/>
