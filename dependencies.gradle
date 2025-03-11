@@ -53,7 +53,7 @@ dependencies {
     implementation 'org.apache.logging.log4j:log4j-api:2.24.2' // the API of log4j 2
     implementation 'org.apache.logging.log4j:log4j-core:2.24.2' // Somehow needed by Buildbot to compile OFBizDynamicThresholdFilter.java
     implementation 'org.apache.poi:poi:5.3.0'
-    implementation 'org.apache.pdfbox:pdfbox:2.0.32' // 3.0.1 does not compile
+    implementation 'org.apache.pdfbox:pdfbox:2.0.33' // 3.0.1 does not compile
     implementation 'org.apache.shiro:shiro-core:1.13.0' // Got "Exception in thread "main" java.lang.UnsupportedOperationException: Cannot create a hash with the given algorithm: argon2" with 2.0.2 in integration tests
     implementation 'org.apache.shiro:shiro-crypto-cipher:2.0.2'
     implementation 'org.apache.sshd:sshd-core:2.14.0'
@@ -62,8 +62,8 @@ dependencies {
     implementation 'org.apache.tika:tika-parsers:2.9.2' // To be compatible with tika-parser-pdf-module below
     implementation 'org.apache.tika:tika-parser-pdf-module:2.9.2' // > 2.9.2 does not compile, see OFBIZ-13155
     implementation 'org.apache.cxf:cxf-rt-frontend-jaxrs:3.6.4' // 4.x+ requires javax.xml.bind -> jakarta.xml.bind namespace change
-    implementation 'org.apache.tomcat:tomcat-catalina-ha:9.0.97' // Remember to change the version number (9 now) in javadoc block if needed.
-    implementation 'org.apache.tomcat:tomcat-jasper:9.0.97'
+    implementation 'org.apache.tomcat:tomcat-catalina-ha:9.0.102' // Remember to change the version number (9 now) in javadoc block if needed.
+    implementation 'org.apache.tomcat:tomcat-jasper:9.0.102'
     implementation 'org.apache.axis2:axis2-kernel:1.8.2'
     implementation 'org.apache.xmlgraphics:batik-anim:1.18'
     implementation 'org.apache.xmlgraphics:batik-util:1.18'
@@ -71,7 +71,7 @@ dependencies {
     implementation 'org.apache.xmlgraphics:fop:2.3' // NOTE: since 2.4 dependencies are messed up. See https://github.com/moqui/moqui-fop/blob/master/build.gradle
     implementation 'org.clojure:clojure:1.12.0'
     implementation 'org.apache.groovy:groovy-all:5.0.0-alpha-11'
-    implementation 'org.freemarker:freemarker:2.3.34-SNAPSHOT' // Remember to change the version number in FreeMarkerWorker class when upgrading. See OFBIZ-10019 if >= 2.4
+    implementation 'org.freemarker:freemarker:2.3.34' // Remember to change the version number in FreeMarkerWorker class when upgrading. See OFBIZ-10019 if >= 2.4
     implementation 'org.owasp.esapi:esapi:2.6.0.0'
     implementation 'org.cyberneko:html:1.9.8'
     implementation 'org.springframework:spring-test:5.3.29' //  6.1.4 does not compile

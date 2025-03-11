@@ -63,8 +63,8 @@ import org.apache.ofbiz.entity.GenericValue;
 import org.apache.ofbiz.entity.util.EntityQuery;
 import org.apache.ofbiz.entity.util.EntityUtilProperties;
 import org.apache.ofbiz.security.CsrfUtil;
-import org.apache.ofbiz.webapp.OfbizUrlBuilder;
 import org.apache.ofbiz.webapp.OfbizPathShortener;
+import org.apache.ofbiz.webapp.OfbizUrlBuilder;
 import org.apache.ofbiz.webapp.control.ConfigXMLReader.ControllerConfig;
 import org.apache.ofbiz.webapp.control.ConfigXMLReader.RequestMap;
 import org.apache.ofbiz.webapp.event.EventFactory;
@@ -89,7 +89,7 @@ public final class RequestHandler {
     private final URL controllerConfigURL;
     private final boolean trackServerHit;
     private final boolean trackVisit;
-    private final List<String> hostHeadersAllowed;
+    private static final List<String> HOSTHEADERSALLOWED = UtilMisc.getHostHeadersAllowed();
     private ControllerConfig ccfg;
 
     private RequestHandler(ServletContext context) {
@@ -106,8 +106,6 @@ public final class RequestHandler {
 
         this.trackServerHit = !"false".equalsIgnoreCase(context.getInitParameter("track-serverhit"));
         this.trackVisit = !"false".equalsIgnoreCase(context.getInitParameter("track-visit"));
-        hostHeadersAllowed = UtilMisc.getHostHeadersAllowed();
-
     }
 
     public static RequestHandler getRequestHandler(ServletContext servletContext) {
@@ -360,7 +358,7 @@ public final class RequestHandler {
     public void doRequest(HttpServletRequest request, HttpServletResponse response, String chain,
                           GenericValue userLogin, Delegator delegator) throws RequestHandlerException, RequestHandlerExceptionAllowExternalRequests {
 
-        if (!hostHeadersAllowed.contains(request.getServerName())) {
+        if (!HOSTHEADERSALLOWED.contains(request.getServerName())) {
             Debug.logError("Domain " + request.getServerName() + " not accepted to prevent host header injection."
                     + " You need to set host-headers-allowed property in security.properties file.", MODULE);
             throw new RequestHandlerException("Domain " + request.getServerName() + " not accepted to prevent host header injection."

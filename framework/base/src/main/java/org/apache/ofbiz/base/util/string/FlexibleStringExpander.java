@@ -668,7 +668,7 @@ public abstract class FlexibleStringExpander implements Serializable, IsEmpty {
         }
     }
 
-    /** An object that represents a <code>${[groovy|bsh]:}</code> expression. */
+    /** An object that represents a <code>${groovy}</code> expression. */
     protected static class ScriptElem extends ArrayOffsetString {
         private final String language;
         private final int parseStart;
