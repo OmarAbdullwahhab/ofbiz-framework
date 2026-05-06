@@ -25,20 +25,20 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
-import javax.el.ArrayELResolver;
-import javax.el.BeanELResolver;
-import javax.el.CompositeELResolver;
-import javax.el.ELContext;
-import javax.el.ELResolver;
-import javax.el.ExpressionFactory;
-import javax.el.FunctionMapper;
-import javax.el.ListELResolver;
-import javax.el.MapELResolver;
-import javax.el.PropertyNotFoundException;
-import javax.el.PropertyNotWritableException;
-import javax.el.ResourceBundleELResolver;
-import javax.el.ValueExpression;
-import javax.el.VariableMapper;
+import jakarta.el.ArrayELResolver;
+import jakarta.el.BeanELResolver;
+import jakarta.el.CompositeELResolver;
+import jakarta.el.ELContext;
+import jakarta.el.ELResolver;
+import jakarta.el.ExpressionFactory;
+import jakarta.el.FunctionMapper;
+import jakarta.el.ListELResolver;
+import jakarta.el.MapELResolver;
+import jakarta.el.PropertyNotFoundException;
+import jakarta.el.PropertyNotWritableException;
+import jakarta.el.ResourceBundleELResolver;
+import jakarta.el.ValueExpression;
+import jakarta.el.VariableMapper;
 
 import org.apache.ofbiz.base.util.Debug;
 import org.apache.ofbiz.base.util.StringUtil;
@@ -226,8 +226,10 @@ public final class UelUtil {
         }
 
         @Override
-        public Object getValue(ELContext context) {
-            return this.object;
+        public <T> T getValue(ELContext context) {
+            @SuppressWarnings("unchecked")
+            T result = (T) this.object;
+            return result;
         }
 
         @Override
@@ -293,8 +295,10 @@ public final class UelUtil {
             return this.varName.hashCode();
         }
         @Override
-        public Object getValue(ELContext context) {
-            return this.elContext.variables.get(this.varName);
+        public <T> T getValue(ELContext context) {
+            @SuppressWarnings("unchecked")
+            T result = (T) this.elContext.variables.get(this.varName);
+            return result;
         }
         @Override
         public String getExpressionString() {
@@ -474,7 +478,8 @@ public final class UelUtil {
 
     /** Prepares an expression for evaluation by UEL.<p>The OFBiz syntax is
      * converted to UEL-compatible syntax and the resulting expression is
-     * returned.</p>
+     * returned.
+     *
      * @see <a href="StringUtil.html#convertOperatorSubstitutions(java.lang.String)">StringUtil.convertOperatorSubstitutions(java.lang.String)</a>
      * @param expression Expression to be converted
      * @return Converted expression

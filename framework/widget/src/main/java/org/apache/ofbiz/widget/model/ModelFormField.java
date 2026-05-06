@@ -290,7 +290,9 @@ public final class ModelFormField {
 
     public String getEntry(Map<String, ? extends Object> context, String defaultValue) {
         Boolean isError = (Boolean) context.get("isError");
-        Boolean useRequestParameters = (Boolean) context.get("useRequestParameters");
+        Boolean useRequestParametersGlobal = (Boolean) context.get("useRequestParameters");
+        Boolean useRequestParametersSpecific = (Boolean) context.get("useRequestParameters." + modelForm.getName());
+        Boolean useRequestParameters = useRequestParametersSpecific != null ? useRequestParametersSpecific : useRequestParametersGlobal;
 
         Locale locale = (Locale) context.get("locale");
         if (locale == null) {
@@ -305,8 +307,6 @@ public final class ModelFormField {
 
         String returnValue;
 
-        // if useRequestParameters is TRUE then parameters will always be used, if FALSE then parameters will never be used
-        // if isError is TRUE and useRequestParameters is not FALSE (ie is null or TRUE) then parameters will be used
         if ((Boolean.TRUE.equals(isError) && !Boolean.FALSE.equals(useRequestParameters))
                 || (Boolean.TRUE.equals(useRequestParameters))) {
             Map<String, Object> parameters = UtilGenerics.checkMap(context.get("parameters"), String.class, Object.class);
@@ -366,7 +366,7 @@ public final class ModelFormField {
             if (retVal != null) {
                 // format string based on the user's locale and time zone
                 if (retVal instanceof Double || retVal instanceof Float || retVal instanceof BigDecimal) {
-                    NumberFormat nf = NumberFormat.getInstance(locale);
+                    NumberFormat nf = NumberFormat.getInstance(Locale.getDefault());
                     nf.setMaximumFractionDigits(10);
                     return nf.format(retVal);
                 } else if (retVal instanceof java.sql.Date) {
@@ -2252,12 +2252,9 @@ public final class ModelFormField {
          * @return the description
          */
         public String getDescription(Map<String, Object> context) {
-            String retVal = null;
-            if (UtilValidate.isNotEmpty(this.description)) {
-                retVal = this.description.expandString(context);
-            } else {
-                retVal = getModelFormField().getEntry(context);
-            }
+            String retVal = UtilValidate.isNotEmpty(this.description)
+                    ? this.description.expandString(context)
+                    : getModelFormField().getEntry(context);
 
             if (UtilValidate.isEmpty(retVal)) {
                 retVal = this.getDefaultValue(context);
@@ -5918,6 +5915,9 @@ public final class ModelFormField {
         private final SubHyperlink subHyperlink;
         private final String type;
         private final String pattern;
+        private final String step;
+        private final String min;
+        private final String max;
 
         public TextField(Element element, ModelFormField modelFormField) {
             super(element, modelFormField);
@@ -5926,6 +5926,9 @@ public final class ModelFormField {
             this.mask = element.getAttribute("mask");
             this.type = element.getAttribute("type");
             this.pattern = element.getAttribute("pattern");
+            this.step = element.getAttribute("step");
+            this.min = element.getAttribute("min");
+            this.max = element.getAttribute("max");
             Integer maxlength = null;
             String maxlengthStr = element.getAttribute("maxlength");
             if (!maxlengthStr.isEmpty()) {
@@ -5965,6 +5968,9 @@ public final class ModelFormField {
             this.mask = "";
             this.type = "";
             this.pattern = "";
+            this.step = "";
+            this.min = "";
+            this.max = "";
             this.maxlength = maxlength;
             this.placeholder = FlexibleStringExpander.getInstance("");
             this.readonly = false;
@@ -5979,6 +5985,9 @@ public final class ModelFormField {
             this.mask = "";
             this.type = type;
             this.pattern = "";
+            this.step = "";
+            this.min = "";
+            this.max = "";
             this.maxlength = maxlength;
             this.placeholder = FlexibleStringExpander.getInstance("");
             this.readonly = false;
@@ -5993,6 +6002,9 @@ public final class ModelFormField {
             this.mask = "";
             this.type = "";
             this.pattern = "";
+            this.step = "";
+            this.min = "";
+            this.max = "";
             this.maxlength = null;
             this.placeholder = FlexibleStringExpander.getInstance("");
             this.readonly = false;
@@ -6015,6 +6027,9 @@ public final class ModelFormField {
             this.mask = original.mask;
             this.type = original.type;
             this.pattern = original.pattern;
+            this.step = original.step;
+            this.min = original.min;
+            this.max = original.max;
             this.placeholder = original.placeholder;
             this.size = original.size;
             this.maxlength = original.maxlength;
@@ -6141,6 +6156,30 @@ public final class ModelFormField {
          */
         public String getPattern() {
             return this.pattern;
+        }
+
+        /**
+         * Gets step.
+         * @return the step
+         */
+        public String getStep() {
+            return this.step;
+        }
+
+        /**
+         * Gets min.
+         * @return the min
+         */
+        public String getMin() {
+            return this.min;
+        }
+
+        /**
+         * Gets max.
+         * @return the max
+         */
+        public String getMax() {
+            return this.max;
         }
     }
 

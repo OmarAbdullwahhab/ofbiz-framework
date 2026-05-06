@@ -203,6 +203,7 @@ Map copyInvoice() {
     List<GenericValue> invoiceItems = serviceResult.invoiceItems
     invoice.invoiceTypeId = parameters.invoiceTypeId ?: invoice.invoiceTypeId
     serviceResult = run service: 'createInvoice', with: [*: invoice.getAllFields(),
+                                                         statusId: 'INVOICE_IN_PROCESS',
                                                          invoiceId: null]
     String newInvoiceId = serviceResult.invoiceId
     invoiceItems.each {
@@ -349,7 +350,7 @@ Map createInvoiceItem() {
     // if there is no amount and a productItem is supplied fill the amount(price) and description from the product record
     //     TODO: there are return adjustments now that make this code very broken. The check for price was added as a quick fix.
     if (invoiceItem.productId) {
-        invoiceItem.quantity = invoiceItem.quantity ?: 1
+        invoiceItem.quantity = (invoiceItem.quantity != null) ? invoiceItem.quantity : 1
         if (!invoiceItem.amount) {
             GenericValue product = from('Product').where(parameters).cache().queryOne()
             invoiceItem.description = product.description
@@ -647,4 +648,17 @@ Map isInvoiceInForeignCurrency() {
             invoice.partyId : invoice.partyIdFrom
     Map serviceResult = run service: 'getPartyAccountingPreferences', with: [organizationPartyId: partyId]
     return success([isForeign: invoice.currencyUomId == serviceResult.baseCurrencyUomId])
+}
+
+/**
+ * Create a Note and link it to an Invoice
+ * @return Success response with the noteId created
+ */
+Map addInvoiceNote() {
+    Map serviceResult = run service: 'createNote', with: [*: parameters,
+                                                          note: parameters.noteInfo]
+    run service: 'createInvoiceNote', with: [*: parameters,
+                                             noteId: serviceResult.noteId]
+    return success(label('AccountingUiLabels', 'AccountingInvoiceNoteAdded'),
+            [noteId: serviceResult.noteId])
 }

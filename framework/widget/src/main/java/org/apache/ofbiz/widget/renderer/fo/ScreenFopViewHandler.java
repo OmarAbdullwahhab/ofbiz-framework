@@ -26,9 +26,9 @@ import java.io.StringWriter;
 import java.io.Writer;
 
 import java.util.Map;
-import javax.servlet.ServletContext;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.ServletContext;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.stream.StreamSource;
 
@@ -69,7 +69,7 @@ public class ScreenFopViewHandler extends AbstractViewHandler {
     private ServletContext servletContext = null;
 
     /**
-     * @see org.apache.ofbiz.webapp.view.ViewHandler#init(javax.servlet.ServletContext)
+     * @see org.apache.ofbiz.webapp.view.ViewHandler#init(jakarta.servlet.ServletContext)
      */
     @Override
     public void init(ServletContext context) throws ViewHandlerException {
@@ -139,7 +139,7 @@ public class ScreenFopViewHandler extends AbstractViewHandler {
                 ? ApacheFopWorker.getAllowEditContentDefault() : (String) context.get("allowEditContent"));
         boolean allowEditAnnotations = Boolean.parseBoolean(UtilValidate.isEmpty(context.get("allowEditAnnotations"))
                 ? ApacheFopWorker.getAllowEditAnnotationsDefault() : (String) context.get("allowEditAnnotations"));
-        if (UtilValidate.isNotEmpty(userPassword) || UtilValidate.isNotEmpty(ownerPassword) || !allowPrint || !allowCopyContent || allowEditContent
+        if (UtilValidate.isNotEmpty(userPassword) || UtilValidate.isNotEmpty(ownerPassword) || !allowPrint || !allowCopyContent || !allowEditContent
                 || !allowEditAnnotations) {
             int encryptionLength = 128;
             try {

@@ -293,7 +293,8 @@ public final class UtilProperties implements Serializable {
     /**
      * Returns a new <code>Properties</code> instance created from <code>fileName</code>.
      * <p>This method is intended for low-level framework classes that need to read
-     * properties files before OFBiz has been fully initialized.</p>
+     * properties files before OFBiz has been fully initialized.
+     *
      * @param fileName The full name of the properties file ("foo.properties")
      * @return A new <code>Properties</code> instance created from <code>fileName</code>, or
      * <code>null</code> if the file was not found
@@ -688,7 +689,8 @@ public final class UtilProperties implements Serializable {
      * if you need <a href="http://www.w3.org/International/">I18n</a> properties, then use
      * <a href="#getResourceBundle(java.lang.String,%20java.util.Locale)">
      * getResourceBundle(String resource, Locale locale)</a>. This method is
-     * intended to be used primarily by the UtilProperties class.</p>
+     * intended to be used primarily by the UtilProperties class.
+     *
      * @param resource The name of the resource - can be a file, class, or URL
      * @param locale The desired locale
      * @return The Properties instance, or null if no matching properties are found

@@ -31,8 +31,8 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.WeakHashMap;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import javax.transaction.Transaction;
 
 import org.apache.commons.lang.StringUtils;
@@ -94,10 +94,9 @@ public class PayPalServices {
 
     public static Map<String, Object> setExpressCheckout(DispatchContext dctx, Map<String, ? extends Object> context) {
         ShoppingCart cart = (ShoppingCart) context.get("cart");
-        Locale locale = cart.getLocale();
-        if (cart == null || cart.items().size() <= 0) {
-            return ServiceUtil.returnError(UtilProperties.getMessage(RESOURCE,
-                    "AccountingPayPalShoppingCartIsEmpty", locale));
+        if (cart == null || cart.isEmpty()) {
+              return ServiceUtil.returnError(UtilProperties.getMessage(RESOURCE,
+                           "AccountingPayPalShoppingCartIsEmpty", (cart == null || cart.getLocale() == null) ? Locale.US : cart.getLocale()));
         }
 
         GenericValue payPalConfig = getPaymentMethodGatewayPayPal(dctx, context, null);

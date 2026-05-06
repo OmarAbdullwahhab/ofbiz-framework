@@ -33,7 +33,7 @@ Map findCustomTimePeriods() {
         List parentOrganizationPartyIdList = serviceResult.parentOrganizationPartyIdList
         EntityCondition condition = new EntityConditionBuilder().AND {
             IN(organizationPartyId: parentOrganizationPartyIdList)
-            LESS_THAN(fromDate: parameters.findDate)
+            LESS_THAN_EQUAL_TO(fromDate: parameters.findDate)
             OR {
                 GREATER_THAN_EQUAL_TO(thruDate: parameters.findDate)
                 EQUALS(thruDate: null)
@@ -52,9 +52,8 @@ Map findCustomTimePeriods() {
             OR {
                 EQUALS(organizationPartyId: null)
                 EQUALS(organizationPartyId: '_NA_')
-
             }
-            LESS_THAN(fromDate: parameters.findDate)
+            LESS_THAN_EQUAL_TO(fromDate: parameters.findDate)
             OR {
                 GREATER_THAN_EQUAL_TO(thruDate: parameters.findDate)
                 EQUALS(thruDate: null)

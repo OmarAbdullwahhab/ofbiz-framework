@@ -26,7 +26,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.TimeZone;
 
-import javax.el.PropertyNotFoundException;
+import jakarta.el.PropertyNotFoundException;
 
 import org.apache.ofbiz.base.lang.IsEmpty;
 import org.apache.ofbiz.base.lang.SourceMonitored;
@@ -116,7 +116,8 @@ public abstract class FlexibleStringExpander implements Serializable, IsEmpty {
      * because it returns <code>null</code> when given a null <code>expression</code>
      * argument, and
      * <code>FlexibleStringExpander.getInstance(expression).expandString(context)</code>
-     * returns an empty <code>String</code>.</p>
+     * returns an empty <code>String</code>.
+     *
      * @param expression The original expression
      * @param context The evaluation context
      * @return The original expression's evaluation result as a <code>String</code>
@@ -133,7 +134,8 @@ public abstract class FlexibleStringExpander implements Serializable, IsEmpty {
      * because it returns <code>null</code> when given a null <code>expression</code>
      * argument, and
      * <code>FlexibleStringExpander.getInstance(expression).expandString(context, locale)</code>
-     * returns an empty <code>String</code>.</p>
+     * returns an empty <code>String</code>.
+     *
      * @param expression The original expression
      * @param context The evaluation context
      * @param locale The locale to be used for localization
@@ -151,7 +153,8 @@ public abstract class FlexibleStringExpander implements Serializable, IsEmpty {
      * because it returns <code>null</code> when given a null <code>expression</code>
      * argument, and
      * <code>FlexibleStringExpander.getInstance(expression).expandString(context, timeZone, locale)</code>
-     * returns an empty <code>String</code>.</p>
+     * returns an empty <code>String</code>.
+     *
      * @param expression The original expression
      * @param context The evaluation context
      * @param timeZone The time zone to be used for localization
@@ -172,14 +175,16 @@ public abstract class FlexibleStringExpander implements Serializable, IsEmpty {
     /** Returns a <code>FlexibleStringExpander</code> object. <p>A null or
      * empty argument will return a <code>FlexibleStringExpander</code>
      * object that represents an empty expression. That object is a shared
-     * singleton, so there is no memory or performance penalty in using it.</p>
+     * singleton, so there is no memory or performance penalty in using it.
+     *
      * <p>If the method is passed a <code>String</code> argument that doesn't
      * contain an expression, the <code>FlexibleStringExpander</code> object
      * that is returned does not perform any evaluations on the original
      * <code>String</code> - any methods that return a <code>String</code>
      * will return the original <code>String</code>. The object returned by
      * this method is very compact - taking less memory than the original
-     * <code>String</code>.</p>
+     * <code>String</code>.
+     *
      * @param expression The original expression
      * @return A <code>FlexibleStringExpander</code> instance
      */
@@ -190,14 +195,16 @@ public abstract class FlexibleStringExpander implements Serializable, IsEmpty {
     /* Returns a <code>FlexibleStringExpander</code> object. <p>A null or
      * empty argument will return a <code>FlexibleStringExpander</code>
      * object that represents an empty expression. That object is a shared
-     * singleton, so there is no memory or performance penalty in using it.</p>
+     * singleton, so there is no memory or performance penalty in using it.
+     *
      * <p>If the method is passed a <code>String</code> argument that doesn't
      * contain an expression, the <code>FlexibleStringExpander</code> object
      * that is returned does not perform any evaluations on the original
      * <code>String</code> - any methods that return a <code>String</code>
      * will return the original <code>String</code>. The object returned by
      * this method is very compact - taking less memory than the original
-     * <code>String</code>.</p>
+     * <code>String</code>.
+     *
      * @param expression The original expression
      * @param useCache whether to store things into a global cache
      * @return A <code>FlexibleStringExpander</code> instance

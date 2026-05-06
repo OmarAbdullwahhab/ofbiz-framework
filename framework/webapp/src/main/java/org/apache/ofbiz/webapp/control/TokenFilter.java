@@ -30,15 +30,15 @@ import org.apache.ofbiz.entity.util.EntityQuery;
 import org.apache.ofbiz.service.ModelService;
 import org.apache.ofbiz.webapp.WebAppUtil;
 
-import javax.servlet.Filter;
-import javax.servlet.FilterConfig;
-import javax.servlet.ServletException;
-import javax.servlet.ServletRequest;
-import javax.servlet.ServletResponse;
-import javax.servlet.FilterChain;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
+import jakarta.servlet.Filter;
+import jakarta.servlet.FilterConfig;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.ServletRequest;
+import jakarta.servlet.ServletResponse;
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 import java.io.IOException;
 import java.util.Locale;
 import java.util.Map;
@@ -63,7 +63,7 @@ public class TokenFilter implements Filter {
         String token = JWTManager.getHeaderAuthBearerToken(httpRequest);
 
         if (UtilValidate.isNotEmpty(token)) {
-            Map<String, Object> result = JWTManager.validateToken(token, JWTManager.getJWTKey(delegator));
+            Map<String, Object> result = JWTManager.validateToken(delegator, token);
             String userLoginId = (String) result.get("userLoginId");
             if (UtilValidate.isNotEmpty(result.get(ModelService.ERROR_MESSAGE))) {
                 httpResponse.setStatus(HttpServletResponse.SC_UNAUTHORIZED);

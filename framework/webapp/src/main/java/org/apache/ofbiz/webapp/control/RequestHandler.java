@@ -26,6 +26,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Enumeration;
@@ -38,11 +39,11 @@ import java.util.Optional;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
-import javax.servlet.ServletContext;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
-import javax.ws.rs.core.MultivaluedHashMap;
+import jakarta.servlet.ServletContext;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
+import jakarta.ws.rs.core.MultivaluedHashMap;
 
 import org.apache.cxf.jaxrs.model.URITemplate;
 import org.apache.ofbiz.base.location.FlexibleLocation;
@@ -316,7 +317,7 @@ public final class RequestHandler {
      * @return true if the request contains some valid certificates, otherwise false.
      */
     static boolean checkCertificates(HttpServletRequest request, Predicate<X509Certificate[]> validator) {
-        return Stream.of("javax.servlet.request.X509Certificate", // 2.2 spec
+        return Stream.of("jakarta.servlet.request.X509Certificate", // 2.2 spec
                 "javax.net.ssl.peer_certificates")       // 2.1 spec
                 .map(request::getAttribute)
                 .filter(Objects::nonNull)
@@ -631,13 +632,7 @@ public final class RequestHandler {
             }
         } else if (requestUri != null) {
             String[] loginUris = EntityUtilProperties.getPropertyValue("security", "login.uris", delegator).split(",");
-            boolean removePreviousRequest = true;
-            for (int i = 0; i < loginUris.length; i++) {
-                if (requestUri.equals(loginUris[i])) {
-                    removePreviousRequest = false;
-                }
-            }
-            if (removePreviousRequest) {
+            if (Arrays.asList(loginUris).contains(requestUri)) {
                 // Remove previous request attribute on navigation to non-authenticated request
                 request.getSession().removeAttribute("_PREVIOUS_REQUEST_");
             }
@@ -1042,7 +1037,7 @@ public final class RequestHandler {
      * @param requestResponse
      */
     private void setUserMessageResponseToRequest(HttpServletRequest request, ConfigXMLReader.RequestResponse requestResponse) {
-        final String fieldMessageName = requestResponse.getName() == "error"
+        final String fieldMessageName = "error".equals(requestResponse.getName())
                 ? "_ERROR_MESSAGE_"
                 : "_EVENT_MESSAGE_";
         final String customMessageField = "_CUSTOM" + fieldMessageName;
@@ -1182,8 +1177,10 @@ public final class RequestHandler {
         // add in the attributes as well so everything needed for the rendering context will be in place if/when we get back to this view
         paramMap.putAll(UtilHttp.getAttributeMap(req));
         UtilMisc.makeMapSerializable(paramMap);
-        // Used by lookups to keep the real view (request)
-        req.getSession().setAttribute("_LAST_VIEW_NAME_", paramMap.getOrDefault("_LAST_VIEW_NAME_", view));
+        // Used by lookups to keep the real view (request); accept the request parameter only if it is a safe view name (alphanumeric/dash/underscore)
+        String lastViewNameParam = (String) paramMap.get("_LAST_VIEW_NAME_");
+        String lastViewName = (lastViewNameParam != null && lastViewNameParam.matches("[\\w\\-]+")) ? lastViewNameParam : view;
+        req.getSession().setAttribute("_LAST_VIEW_NAME_", lastViewName);
         req.getSession().setAttribute("_LAST_VIEW_PARAMS_", paramMap);
 
         if ("SAVED".equals(saveName)) {
@@ -1433,7 +1430,12 @@ public final class RequestHandler {
 
         //If required by webSite parameter, surcharge control path
         if (webSiteProps.getWebappPath() != null) {
-            String requestPath = request.getServletPath();
+            // Derive servlet path from the trusted _CONTROL_PATH_ request attribute (set by ControlServlet)
+            // rather than calling getServletPath() directly on the request, to avoid relying on user-influenced input.
+            String contextPath = request.getContextPath();
+            String requestPath = controlPath.startsWith(contextPath)
+                    ? controlPath.substring(contextPath.length())
+                    : controlPath;
             if (requestPath == null) requestPath = "";
             if (requestPath.lastIndexOf("/") > 0) {
                 if (requestPath.indexOf("/") == 0) {

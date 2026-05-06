@@ -26,6 +26,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URL;
 
+import javax.xml.XMLConstants;
 import javax.xml.transform.Result;
 import javax.xml.transform.Source;
 import javax.xml.transform.Transformer;
@@ -165,6 +166,9 @@ public final class ApacheFopWorker {
         Result res = new SAXResult(fop.getDefaultHandler());
         try {
             TransformerFactory factory = TransformerFactory.newInstance();
+            factory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
+            factory.setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, "");
+            factory.setAttribute(XMLConstants.ACCESS_EXTERNAL_STYLESHEET, "");
             Transformer transformer;
             if (stylesheet == null) {
                 transformer = factory.newTransformer();
@@ -212,12 +216,15 @@ public final class ApacheFopWorker {
         return fop;
     }
 
-    /** Returns a temporary File instance. The temporary file name starts with
-     * <a href="#tempFilePrefix">tempFilePrefix</a> and ends with ".xml".
-     * Calling methods are responsible for deleting the temporary file.<p>
-     * FOP performs transforms in memory, so if there is any chance FO output
-     * will be more than a few pages, it would be best to keep FO input in a temporary
-     * file.</p>
+    /**
+     * Returns a temporary File instance. The temporary file name starts with
+     * <a href="#tempFilePrefix">tempFilePrefix</a> and ends with ".xml". Calling
+     * methods are responsible for deleting the temporary file.
+     *
+     * FOP performs transforms in memory, so if there is any chance FO output will
+     * be more than a few pages, it would be best to keep FO input in a temporary
+     * file.
+     *
      * @return File instance
      */
     public static File createTempFoXmlFile() throws IOException {
@@ -226,12 +233,15 @@ public final class ApacheFopWorker {
         return tempXmlFile;
     }
 
-    /** Returns a temporary File instance. The temporary file name starts with
-     * <a href="#tempFilePrefix">tempFilePrefix</a> and ends with ".res".
-     * Calling methods are responsible for deleting the temporary file.<p>
-     * FOP performs transforms in memory, so if there is any chance FO output
-     * will be more than a few pages, it would be best to keep FO output in a temporary
-     * file.</p>
+    /**
+     * Returns a temporary File instance. The temporary file name starts with
+     * <a href="#tempFilePrefix">tempFilePrefix</a> and ends with ".res". Calling
+     * methods are responsible for deleting the temporary file.
+     *
+     * FOP performs transforms in memory, so if there is any chance FO output will
+     * be more than a few pages, it would be best to keep FO output in a temporary
+     * file.
+     *
      * @return File instance
      */
     public static File createTempResultFile() throws IOException {

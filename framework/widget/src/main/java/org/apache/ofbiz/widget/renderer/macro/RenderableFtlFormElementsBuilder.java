@@ -30,14 +30,13 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
-import java.util.UUID;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 
 import com.ibm.icu.util.Calendar;
 import org.apache.ofbiz.base.util.Debug;
@@ -48,6 +47,7 @@ import org.apache.ofbiz.base.util.UtilGenerics;
 import org.apache.ofbiz.base.util.UtilHttp;
 import org.apache.ofbiz.base.util.UtilMisc;
 import org.apache.ofbiz.base.util.UtilProperties;
+import org.apache.ofbiz.base.util.UtilRandom;
 import org.apache.ofbiz.base.util.UtilValidate;
 import org.apache.ofbiz.base.util.string.FlexibleStringExpander;
 import org.apache.ofbiz.webapp.control.RequestHandler;
@@ -259,6 +259,17 @@ public final class RenderableFtlFormElementsBuilder {
         if (List.of("text", "email", "url", "tel").contains(type)) {
             pattern = textField.getPattern();
         }
+        String step = "";
+        String min = "";
+        String max = "";
+        if (List.of("number", "range").contains(type)) {
+            min = textField.getMin();
+            max = textField.getMax();
+            step = textField.getStep();
+            if (UtilValidate.isEmpty(step)) {
+                step = "any";
+            }
+        }
         List<String> classes = new ArrayList<>();
         String alert = "false";
         String mask = "";
@@ -309,6 +320,9 @@ public final class RenderableFtlFormElementsBuilder {
                 .stringParameter("className", String.join(" ", classes))
                 .stringParameter("type", type)
                 .stringParameter("pattern", pattern)
+                .stringParameter("step", step)
+                .stringParameter("min", min)
+                .stringParameter("max", max)
                 .stringParameter("alert", alert)
                 .stringParameter("value", value)
                 .stringParameter("textSize", textSize)
@@ -364,9 +378,7 @@ public final class RenderableFtlFormElementsBuilder {
 
         if (textareaField.getVisualEditorEnable()) {
             builder.booleanParameter("visualEditorEnable", true);
-
-            String buttons = textareaField.getVisualEditorButtons(context);
-            builder.stringParameter("buttons", UtilValidate.isEmpty(buttons) ? "maxi" : buttons);
+            builder.stringParameter("buttons", textareaField.getVisualEditorButtons(context));
         }
 
         if (textareaField.isReadOnly()) {
@@ -842,7 +854,7 @@ public final class RenderableFtlFormElementsBuilder {
 
         } else {
             if ("layered-modal".equals(realLinkType)) {
-                String uniqueItemName = "Modal_".concat(UUID.randomUUID().toString().replace("-", "_"));
+                String uniqueItemName = UtilRandom.getUnique("Modal_", true);
                 String width = (String) request.getAttribute("width");
                 if (UtilValidate.isEmpty(width)) {
                     width = String.valueOf(modelTheme.getLinkDefaultLayeredModalWidth());

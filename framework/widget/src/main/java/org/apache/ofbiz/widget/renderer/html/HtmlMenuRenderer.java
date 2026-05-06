@@ -19,19 +19,18 @@
 package org.apache.ofbiz.widget.renderer.html;
 
 import java.io.IOException;
-import java.math.BigDecimal;
 import java.net.URI;
 import java.util.List;
 import java.util.Map;
 
-import javax.servlet.ServletContext;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
+import jakarta.servlet.ServletContext;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 
 import org.apache.ofbiz.base.util.StringUtil;
 import org.apache.ofbiz.base.util.UtilCodec;
-import org.apache.ofbiz.base.util.UtilMisc;
+import org.apache.ofbiz.base.util.UtilRandom;
 import org.apache.ofbiz.base.util.UtilValidate;
 import org.apache.ofbiz.entity.GenericValue;
 import org.apache.ofbiz.webapp.control.RequestHandler;
@@ -424,8 +423,7 @@ public class HtmlMenuRenderer extends HtmlWidgetRenderer implements MenuStringRe
             HttpServletRequest request = (HttpServletRequest) context.get("request");
 
             String targetWindow = link.getTargetWindow(context);
-            String uniqueItemName = menuItem.getModelMenu().getName() + "_" + menuItem.getName() + "_LF_"
-                    + UtilMisc.<String>addToBigDecimalInMap(context, "menuUniqueItemIndex", BigDecimal.ONE);
+            String uniqueItemName = UtilRandom.getUnique(menuItem.getModelMenu().getName() + "_" + menuItem.getName() + "_", true);
 
             String linkType = WidgetWorker.determineAutoLinkType(link.getLinkType(), target, link.getUrlMode(), request);
             boolean isHiddenForm = "hidden-form".equals(linkType);

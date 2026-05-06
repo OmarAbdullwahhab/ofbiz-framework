@@ -3688,9 +3688,8 @@
         <value xml:lang="zh-TW">電子郵件</value>
     </property>
     <property key="CommonEmptyHeader">
-        <value xml:lang="en" xml:space="preserve" />
-        <value xml:lang="es" xml:space="preserve" />
-        <value xml:lang="es-MX" xml:space="preserve" />
+        <!-- do not  remove this! No need to be translated, "en" is the default for all labels -->
+        <value xml:lang="en" xml:space="preserve" > </value>
     </property>
     <property key="CommonEnable">
         <value xml:lang="ar">تفعيل</value>
@@ -13730,6 +13729,15 @@
         <value xml:lang="zh-CN">邮编</value>
         <value xml:lang="zh-TW">郵遞區號</value>
     </property>
+    <property key="CommonTypeToFilter">
+        <value xml:lang="ar">تصفية</value>
+        <value xml:lang="de">filtern</value>
+        <value xml:lang="en">filter</value>
+        <value xml:lang="es">filtrar</value>
+        <value xml:lang="es-CL">filtrar</value>
+        <value xml:lang="es-MX">filtrar</value>
+        <value xml:lang="fr">filtrer</value>
+    </property>
     <property key="Content">
         <value xml:lang="ar">المحتوى</value>
         <value xml:lang="cs">Obsah</value>
@@ -16138,6 +16146,11 @@
         <value xml:lang="zh">俄语</value>
         <value xml:lang="zh-TW">俄語</value>
     </property>
+   <property key="tr">
+      <value xml:lang="en">Turkish</value>
+      <value xml:lang="fr">Turk</value>
+      <value xml:lang="tr">Türkçe</value>
+   </property>
     <property key="zh">
         <value xml:lang="ar">صينية</value>
         <value xml:lang="cs">Čínština</value>

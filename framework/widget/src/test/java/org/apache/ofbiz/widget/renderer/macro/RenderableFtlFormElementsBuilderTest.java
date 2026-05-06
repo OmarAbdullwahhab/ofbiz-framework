@@ -37,9 +37,9 @@ import org.apache.ofbiz.widget.renderer.macro.renderable.RenderableFtl;
 import org.apache.ofbiz.widget.renderer.macro.renderable.RenderableFtlNoop;
 import org.junit.Test;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -252,6 +252,7 @@ public class RenderableFtlFormElementsBuilderTest {
         final RenderableFtl renderableFtl = renderableFtlFormElementsBuilder.textField(Map.of("session", httpSession), textField, true);
         assertThat(renderableFtl, MacroCallMatcher.hasName("renderTextField"));
         assertThat(renderableFtl, MacroCallMatcher.hasParameters(MacroCallParameterMatcher.hasNameAndStringValue("type", "text")));
+        assertThat(renderableFtl, MacroCallMatcher.hasParameters(MacroCallParameterMatcher.hasNameAndStringValue("step", "")));
     }
 
     @Test
@@ -259,6 +260,8 @@ public class RenderableFtlFormElementsBuilderTest {
         new Expectations() {
             {
                 textField.getType(); result = "number";
+                textField.getMin(); result = "2";
+                textField.getMax(); result = "8";
                 httpSession.getAttribute("delegatorName"); result = "DelegatorName";
             }
         };
@@ -266,6 +269,25 @@ public class RenderableFtlFormElementsBuilderTest {
         final RenderableFtl renderableFtl = renderableFtlFormElementsBuilder.textField(Map.of("session", httpSession), textField, true);
         assertThat(renderableFtl, MacroCallMatcher.hasName("renderTextField"));
         assertThat(renderableFtl, MacroCallMatcher.hasParameters(MacroCallParameterMatcher.hasNameAndStringValue("type", "number")));
+        assertThat(renderableFtl, MacroCallMatcher.hasParameters(MacroCallParameterMatcher.hasNameAndStringValue("step", "any")));
+        assertThat(renderableFtl, MacroCallMatcher.hasParameters(MacroCallParameterMatcher.hasNameAndStringValue("min", "2")));
+        assertThat(renderableFtl, MacroCallMatcher.hasParameters(MacroCallParameterMatcher.hasNameAndStringValue("max", "8")));
+    }
+
+    @Test
+    public void textFieldTypeNumberCustomStep(@Mocked final ModelFormField.TextField textField) {
+        new Expectations() {
+            {
+                textField.getType(); result = "number";
+                textField.getStep(); result = "0.1";
+                httpSession.getAttribute("delegatorName"); result = "DelegatorName";
+            }
+        };
+
+        final RenderableFtl renderableFtl = renderableFtlFormElementsBuilder.textField(Map.of("session", httpSession), textField, true);
+        assertThat(renderableFtl, MacroCallMatcher.hasName("renderTextField"));
+        assertThat(renderableFtl, MacroCallMatcher.hasParameters(MacroCallParameterMatcher.hasNameAndStringValue("type", "number")));
+        assertThat(renderableFtl, MacroCallMatcher.hasParameters(MacroCallParameterMatcher.hasNameAndStringValue("step", "0.1")));
     }
 
     @Test
@@ -280,6 +302,7 @@ public class RenderableFtlFormElementsBuilderTest {
         final RenderableFtl renderableFtl = renderableFtlFormElementsBuilder.textField(Map.of("session", httpSession), textField, true);
         assertThat(renderableFtl, MacroCallMatcher.hasName("renderTextField"));
         assertThat(renderableFtl, MacroCallMatcher.hasParameters(MacroCallParameterMatcher.hasNameAndStringValue("type", "email")));
+        assertThat(renderableFtl, MacroCallMatcher.hasParameters(MacroCallParameterMatcher.hasNameAndStringValue("step", "")));
     }
 
     @Test
@@ -294,6 +317,7 @@ public class RenderableFtlFormElementsBuilderTest {
         final RenderableFtl renderableFtl = renderableFtlFormElementsBuilder.textField(Map.of("session", httpSession), textField, true);
         assertThat(renderableFtl, MacroCallMatcher.hasName("renderTextField"));
         assertThat(renderableFtl, MacroCallMatcher.hasParameters(MacroCallParameterMatcher.hasNameAndStringValue("type", "url")));
+        assertThat(renderableFtl, MacroCallMatcher.hasParameters(MacroCallParameterMatcher.hasNameAndStringValue("step", "")));
     }
 
     @Test
@@ -308,6 +332,27 @@ public class RenderableFtlFormElementsBuilderTest {
         final RenderableFtl renderableFtl = renderableFtlFormElementsBuilder.textField(Map.of("session", httpSession), textField, true);
         assertThat(renderableFtl, MacroCallMatcher.hasName("renderTextField"));
         assertThat(renderableFtl, MacroCallMatcher.hasParameters(MacroCallParameterMatcher.hasNameAndStringValue("type", "tel")));
+        assertThat(renderableFtl, MacroCallMatcher.hasParameters(MacroCallParameterMatcher.hasNameAndStringValue("step", "")));
+    }
+
+    @Test
+    public void textFieldTypeRange(@Mocked final ModelFormField.TextField textField) {
+        new Expectations() {
+            {
+                textField.getType(); result = "range";
+                textField.getMin(); result = "15";
+                textField.getMax(); result = "30";
+                textField.getStep(); result = "3";
+                httpSession.getAttribute("delegatorName"); result = "DelegatorName";
+            }
+        };
+
+        final RenderableFtl renderableFtl = renderableFtlFormElementsBuilder.textField(Map.of("session", httpSession), textField, true);
+        assertThat(renderableFtl, MacroCallMatcher.hasName("renderTextField"));
+        assertThat(renderableFtl, MacroCallMatcher.hasParameters(MacroCallParameterMatcher.hasNameAndStringValue("type", "range")));
+        assertThat(renderableFtl, MacroCallMatcher.hasParameters(MacroCallParameterMatcher.hasNameAndStringValue("min", "15")));
+        assertThat(renderableFtl, MacroCallMatcher.hasParameters(MacroCallParameterMatcher.hasNameAndStringValue("max", "30")));
+        assertThat(renderableFtl, MacroCallMatcher.hasParameters(MacroCallParameterMatcher.hasNameAndStringValue("step", "3")));
     }
 
     @Test
@@ -438,6 +483,56 @@ public class RenderableFtlFormElementsBuilderTest {
         final RenderableFtl renderableFtl = renderableFtlFormElementsBuilder.textArea(context, textareaField);
         assertThat(renderableFtl, MacroCallMatcher.hasNameAndParameters("renderTextareaField",
                 MacroCallParameterMatcher.hasNameAndBooleanValue("disabled", true)));
+    }
+
+    @Test
+    public void textareaFieldVisualEditorEnabledNoButtons(@Mocked final ModelFormField.TextareaField textareaField) {
+        new Expectations() {
+            {
+                modelFormField.getDisabled(withNotNull());
+                result = true;
+
+                textareaField.getVisualEditorEnable();
+                result = true;
+
+                textareaField.getVisualEditorButtons(withNotNull());
+                result = "";
+            }
+        };
+
+        final HashMap<String, Object> context = new HashMap<>();
+
+        final RenderableFtl renderableFtl = renderableFtlFormElementsBuilder.textArea(context, textareaField);
+        assertThat(renderableFtl, MacroCallMatcher.hasNameAndParameters("renderTextareaField",
+                MacroCallParameterMatcher.hasNameAndBooleanValue("visualEditorEnable", true)));
+    }
+
+    @Test
+    public void textareaFieldVisualEditorEnabledButtons(@Mocked final ModelFormField.TextareaField textareaField) {
+        String editorConfiguration = "[['formatting'],['strong','em','del'],['link'],['unorderedList','orderedList'],"
+                + "['horizontalRule'],['removeformat'],['indent','outdent'],['fullscreen']]";
+
+        new Expectations() {
+            {
+                modelFormField.getDisabled(withNotNull());
+                result = true;
+
+                textareaField.getVisualEditorEnable();
+                result = true;
+
+                textareaField.getVisualEditorButtons(withNotNull());
+                result = editorConfiguration;
+            }
+        };
+
+        final HashMap<String, Object> context = new HashMap<>();
+
+        final RenderableFtl renderableFtl = renderableFtlFormElementsBuilder.textArea(context, textareaField);
+        assertThat(renderableFtl, MacroCallMatcher.hasNameAndParameters("renderTextareaField",
+                MacroCallParameterMatcher.hasNameAndBooleanValue("visualEditorEnable", true)));
+        assertThat(renderableFtl, MacroCallMatcher.hasNameAndParameters(
+                "renderTextareaField",
+                MacroCallParameterMatcher.hasNameAndStringValue("buttons", editorConfiguration)));
     }
 
     @Test

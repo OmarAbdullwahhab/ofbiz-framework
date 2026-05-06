@@ -25,9 +25,9 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import javax.servlet.ServletContext;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
+import jakarta.servlet.ServletContext;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
 import javax.xml.parsers.ParserConfigurationException;
 import org.apache.ofbiz.base.location.FlexibleLocation;
 import org.apache.ofbiz.base.util.Debug;
@@ -180,7 +180,7 @@ public final class ThemeFactory {
                     if (modelTheme == null) {
                         URL themeFileUrl = null;
                         themeFileUrl = FlexibleLocation.resolveLocation(resourceName);
-                        if (themeFileUrl == null) {
+                        if (themeFileUrl == null || UtilValidate.isUrlInStringAndDoesNotStartByComponentProtocol(themeFileUrl.toString())) {
                             throw new IllegalArgumentException("Could not resolve location to URL: " + resourceName);
                         }
                         Document themeFileDoc = UtilXml.readXmlDocument(themeFileUrl, true, true);

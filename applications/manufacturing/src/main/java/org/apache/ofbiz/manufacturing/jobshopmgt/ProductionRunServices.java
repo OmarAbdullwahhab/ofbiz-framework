@@ -1324,6 +1324,57 @@ public class ProductionRunServices {
             return ServiceUtil.returnError(UtilProperties.getMessage(RESOURCE, "ManufacturingProductionRunUnableToCreateMaterialsCosts",
                     UtilMisc.toMap("productionRunTaskId", productionRunTaskId, "errorString", ge.getMessage()), locale));
         }
+
+        // labor costs: these are the costs derived from the actual time logged on the production run task decleration
+        try {
+            List<GenericValue> timeEntries = EntityQuery.use(delegator).from("TimeEntry")
+                    .where("workEffortId", productionRunTaskId)
+                    .queryList();
+            for (GenericValue timeEntry : timeEntries) {
+                BigDecimal hours = timeEntry.getBigDecimal("hours");
+                if (UtilValidate.isNotEmpty(hours)) {
+                    // Try to find specific rate for the party with FLC type
+                    GenericValue rateAmount = EntityQuery.use(delegator).from("RateAmount")
+                            .where("partyId", timeEntry.getString("partyId"), "rateTypeId", "FLC")
+                            .filterByDate(timeEntry.getTimestamp("fromDate"))
+                            .queryFirst();
+
+                    // Fallback to generic rate if specific rate not found
+                    if (UtilValidate.isEmpty(rateAmount)) {
+                        rateAmount = EntityQuery.use(delegator).from("RateAmount")
+                                .where("partyId", "_NA_", "rateTypeId", "FLC")
+                                .filterByDate(timeEntry.getTimestamp("fromDate"))
+                                .queryFirst();
+                    }
+
+                    if (UtilValidate.isNotEmpty(rateAmount)) {
+                        BigDecimal rate = rateAmount.getBigDecimal("rateAmount");
+                        if (UtilValidate.isNotEmpty(rate)) {
+                            BigDecimal laborCost = rate.multiply(hours).setScale(DECIMALS, ROUNDING);
+                            Map<String, Object> inMap = UtilMisc.<String, Object>toMap("userLogin", userLogin,
+                                    "workEffortId", productionRunTaskId);
+                            inMap.put("costComponentTypeId", "ACTUAL_LABOR_COST");
+                            inMap.put("costUomId", rateAmount.getString("rateCurrencyUomId"));
+                            inMap.put("cost", laborCost);
+                            serviceResult = dispatcher.runSync("createCostComponent", inMap);
+                            if (ServiceUtil.isError(serviceResult)) {
+                                return ServiceUtil.returnError(ServiceUtil.getErrorMessage(serviceResult));
+                            }
+                        }
+                    }
+                }
+            }
+        } catch (GenericEntityException ge) {
+            return ServiceUtil.returnError(UtilProperties.getMessage(RESOURCE,
+                    "ManufacturingProductionRunUnableToCreateLaborCosts",
+                    UtilMisc.toMap("productionRunTaskId", productionRunTaskId, "errorString", ge.getMessage()),
+                    locale));
+        } catch (Exception e) {
+            return ServiceUtil.returnError(UtilProperties.getMessage(RESOURCE,
+                    "ManufacturingProductionRunUnableToCreateLaborCosts",
+                    UtilMisc.toMap("productionRunTaskId", productionRunTaskId, "errorString", e.getMessage()),
+                    locale));
+        }
         return ServiceUtil.returnSuccess();
     }
 
@@ -1869,7 +1920,7 @@ public class ProductionRunServices {
                     }
                 }
                 if (totalCost != null) {
-                    unitCost = totalCost.divide(quantity);
+                    unitCost = totalCost.divide(quantity, DECIMALS, ROUNDING);
                 } else {
                     unitCost = BigDecimal.ZERO;
                 }
@@ -2433,6 +2484,24 @@ public class ProductionRunServices {
             }
         }
 
+        // Make TimeEntry records for the labor cost
+        try {
+            if (UtilValidate.isNotEmpty(addTaskTime) && addTaskTime.compareTo(BigDecimal.ZERO) > 0) {
+                Map<String, Object> serviceContext = UtilMisc.toMap("workEffortId", workEffortId,
+                        "rateTypeId", "FLC",
+                        "partyId", partyId,
+                        "userLogin", userLogin);
+                serviceContext.put("hours", addTaskTime.divide(new BigDecimal(3600000), 6, ROUNDING).doubleValue());
+                serviceContext.put("comments", "Task time added via Declaration");
+                Map<String, Object> serviceResult = dispatcher.runSync("createTimeEntry", serviceContext);
+                if (ServiceUtil.isError(serviceResult)) {
+                    return ServiceUtil.returnError(ServiceUtil.getErrorMessage(serviceResult));
+                }
+            }
+        } catch (GenericServiceException exc) {
+            return ServiceUtil.returnError(exc.getMessage());
+        }
+
         // Create a new TimeEntry
         try {
             Map<String, Object> serviceContext = new HashMap<>();
@@ -2528,10 +2597,13 @@ public class ProductionRunServices {
         if (quantity == null) {
             quantity = requirement.getBigDecimal("quantity");
         }
+        if (quantity == null) {
+            quantity = BigDecimal.ONE;
+        }
         Map<String, Object> serviceContext = new HashMap<>();
         serviceContext.clear();
         serviceContext.put("productId", requirement.getString("productId"));
-        serviceContext.put("quantity", quantity);
+        serviceContext.put("pRQuantity", quantity);
         serviceContext.put("startDate", requirement.getTimestamp("requirementStartDate"));
         serviceContext.put("facilityId", requirement.getString("facilityId"));
         String workEffortName = null;
@@ -2547,7 +2619,7 @@ public class ProductionRunServices {
         serviceContext.put("userLogin", userLogin);
         Map<String, Object> serviceResult = null;
         try {
-            serviceResult = dispatcher.runSync("createProductionRunsForProductBom", serviceContext);
+            serviceResult = dispatcher.runSync("createProductionRun", serviceContext);
             if (ServiceUtil.isError(serviceResult)) {
                 return ServiceUtil.returnError(UtilProperties.getMessage(RESOURCE, "ManufacturingProductionRunNotCreated", locale)
                         + ": " + ServiceUtil.getErrorMessage(serviceResult));

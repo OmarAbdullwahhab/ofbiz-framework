@@ -37,15 +37,16 @@ import java.util.HashMap;
 import java.util.Map;
 
 import javax.imageio.ImageIO;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 
 import org.apache.commons.lang.RandomStringUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.ofbiz.base.lang.JSON;
 import org.apache.ofbiz.base.location.FlexibleLocation;
 import org.apache.ofbiz.base.util.Debug;
+import org.apache.ofbiz.base.util.GeneralException;
 import org.apache.ofbiz.base.util.UtilGenerics;
 import org.apache.ofbiz.base.util.UtilHttp;
 import org.apache.ofbiz.base.util.UtilProperties;
@@ -57,6 +58,7 @@ import org.apache.ofbiz.entity.GenericValue;
 import org.apache.ofbiz.entity.util.EntityUtilProperties;
 import org.apache.ofbiz.webapp.control.JWTManager;
 import org.apache.ofbiz.webapp.control.LoginWorker;
+import org.apache.ofbiz.security.SecurityUtil;
 import org.apache.ofbiz.widget.model.ModelWidget;
 import org.apache.ofbiz.widget.model.ScriptLinkHelper;
 import org.apache.ofbiz.widget.model.ThemeFactory;
@@ -71,13 +73,13 @@ public class CommonEvents {
 
     // Attributes removed for security reason; _ERROR_MESSAGE_ and _ERROR_MESSAGE_LIST are kept
     private static final String[] IGNOREATTRS = new String[] {
-        "javax.servlet.request.key_size",
+        "jakarta.servlet.request.key_size",
         "_CONTEXT_ROOT_",
         "_FORWARDED_FROM_SERVLET_",
-        "javax.servlet.request.ssl_session",
-        "javax.servlet.request.ssl_session_id",
+        "jakarta.servlet.request.ssl_session",
+        "jakarta.servlet.request.ssl_session_id",
         "multiPartMap",
-        "javax.servlet.request.cipher_suite",
+        "jakarta.servlet.request.cipher_suite",
         "targetRequestUri",
         "_SERVER_ROOT_URL_",
         "_CONTROL_PATH_",
@@ -253,6 +255,8 @@ public class CommonEvents {
         // jsonStr.length is not reliable for unicode characters
         response.setContentLength(jsonStr.getBytes("UTF8").length);
 
+        // Set default security headers
+        UtilHttp.setResponseBrowserDefaultSecurityHeaders(response, null);
         // return the JSON String
         Writer out;
         try {
@@ -412,6 +416,7 @@ public class CommonEvents {
                     if (!platformSpecificPath.contains(File.separator) && "\\".equals(File.separator)) {
                         platformSpecificPath = platformSpecificPath.replace("/", "\\");
                     }
+                    SecurityUtil.checkOfbizFileAllowList(new File(platformSpecificPath));
                     // get line number
                     int lineNumber = 1;
                     if (UtilValidate.isNotEmpty(fragment)) {
@@ -444,7 +449,7 @@ public class CommonEvents {
                         Debug.logInfo(line, MODULE);
                     }
                     return "success";
-                } catch (IOException e) {
+                } catch (GeneralException | IOException e) {
                     Debug.logError(e, MODULE);
                 }
             }

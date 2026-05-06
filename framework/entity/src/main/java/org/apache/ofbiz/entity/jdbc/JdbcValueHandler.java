@@ -37,6 +37,7 @@ import java.util.Map;
 import javax.sql.rowset.serial.SerialBlob;
 
 import org.apache.ofbiz.base.util.Debug;
+import org.apache.ofbiz.base.util.SafeObjectInputStream;
 
 /**
  * An object that handles getting/setting column values in JDBC
@@ -617,7 +618,7 @@ public abstract class JdbcValueHandler<T> {
                 if (bis == null) {
                     return null;
                 }
-                in = new ObjectInputStream(bis);
+                in = new SafeObjectInputStream(bis);
                 return in.readObject();
             } catch (Exception e) {
                 throw new SQLException(e);
@@ -744,7 +745,8 @@ public abstract class JdbcValueHandler<T> {
      * don't support sub-second precision. If the date-time field type
      * is a <code>CHAR(30)</code> SQL type, <code>java.sql.Timestamp</code>s
      * will be stored as JDBC timestamp escape format strings
-     * (<code>yyyy-mm-dd hh:mm:ss.fffffffff</code>), referenced to UTC.</p>
+     * (<code>yyyy-mm-dd hh:mm:ss.fffffffff</code>), referenced to UTC.
+     *
      */
     protected static class TimestampJdbcValueHandler extends JdbcValueHandler<java.sql.Timestamp> {
         protected TimestampJdbcValueHandler(int jdbcType) {

@@ -32,8 +32,8 @@ import java.util.Map;
 import java.util.ServiceLoader;
 import java.util.Set;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 import org.apache.ofbiz.base.location.FlexibleLocation;
 import org.apache.ofbiz.base.util.Assert;
@@ -65,7 +65,7 @@ import org.w3c.dom.Element;
  * design pattern. Mini-language XML files are parsed twice - first into a W3C DOM
  * tree, then the DOM tree is parsed into element model objects. Each XML element
  * has a model class, and each model class has its own factory.
- * </p>
+ *
  * <p>
  * Mini-language can be extended by:</p>
  * <ul>
@@ -279,7 +279,8 @@ public final class SimpleMethod extends MiniLangElement {
      * Returns a List of <code>SimpleMethod</code> objects compiled from <code>xmlResource</code>.
      * The ordering in the List is the same as the XML file.
      * <p>This method is used by unit test framework to run tests in the order they appear in the XML file.
-     * Method caching is bypassed since the methods are executed only once.</p>
+     * Method caching is bypassed since the methods are executed only once.
+     *
      * @param xmlResource
      * @param loader
      * @return

@@ -190,7 +190,8 @@ public final class ScriptUtil {
      * Returns a <code>ScriptContext</code> that contains the members of <code>context</code>.
      * <p>If a <code>CompiledScript</code> instance is to be shared by multiple threads, then
      * each thread must create its own <code>ScriptContext</code> and pass it to the
-     * <code>CompiledScript</code> eval method.</p>
+     * <code>CompiledScript</code> eval method.
+     *
      * @param context
      * @return
      */
@@ -211,7 +212,8 @@ public final class ScriptUtil {
      * Returns a <code>ScriptContext</code> that contains the members of <code>context</code>.
      * <p>If a <code>CompiledScript</code> instance is to be shared by multiple threads, then
      * each thread must create its own <code>ScriptContext</code> and pass it to the
-     * <code>CompiledScript</code> eval method.</p>
+     * <code>CompiledScript</code> eval method.
+     *
      * @param context
      * @param protectedKeys
      * @return

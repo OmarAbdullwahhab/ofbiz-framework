@@ -39,8 +39,8 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.function.Predicate;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.HttpMethod;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.ws.rs.HttpMethod;
 
 import org.hamcrest.Matchers;
 import org.junit.Before;

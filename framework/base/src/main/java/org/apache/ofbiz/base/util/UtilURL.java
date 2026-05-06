@@ -54,7 +54,8 @@ public final class UtilURL {
      * <code>null</code> if the resource is not found.
      * <p>This method uses various ways to locate the resource, and in all
      * cases it tests to see if the resource exists - so it
-     * is very inefficient.</p>
+     * is very inefficient.
+     *
      * @param resourceName
      * @return
      */
@@ -74,7 +75,8 @@ public final class UtilURL {
      * <code>null</code> if the resource is not found.
      * <p>This method uses various ways to locate the resource, and in all
      * cases it tests to see if the resource exists - so it
-     * is very inefficient.</p>
+     * is very inefficient.
+     *
      * @param resourceName
      * @param loader
      * @return

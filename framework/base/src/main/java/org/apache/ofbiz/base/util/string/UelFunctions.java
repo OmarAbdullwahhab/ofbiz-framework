@@ -35,13 +35,16 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.TimeZone;
 
-import javax.el.FunctionMapper;
+import jakarta.el.FunctionMapper;
+
+import javax.xml.XMLConstants;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.stream.StreamSource;
 
-import org.apache.commons.lang3.StringUtils;
 import org.apache.ofbiz.base.location.FlexibleLocation;
 import org.apache.ofbiz.base.util.Debug;
 import org.apache.ofbiz.base.util.FileUtil;
@@ -49,7 +52,6 @@ import org.apache.ofbiz.base.util.UtilDateTime;
 import org.apache.ofbiz.base.util.UtilProperties;
 import org.apache.ofbiz.base.util.UtilXml;
 import org.apache.ofbiz.widget.renderer.ScreenRenderer;
-import org.cyberneko.html.parsers.DOMParser;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
@@ -289,7 +291,8 @@ public class UelFunctions {
 
     public static String replaceFirst(String str1, String str2, String str3) {
         if (null == str1) return null;
-        return StringUtils.replaceOnce(str1, str2, str3);
+        int idx = str1.indexOf(str2);
+        return idx < 0 ? str1 : str1.substring(0, idx) + str3 + str1.substring(idx + str2.length());
     }
 
     public static boolean startsWith(String str1, String str2) {
@@ -365,14 +368,20 @@ public class UelFunctions {
         try {
             URL url = FlexibleLocation.resolveLocation(str);
             if (url != null) {
-                DOMParser parser = new DOMParser();
-                parser.setFeature("http://xml.org/sax/features/namespaces", false);
-                parser.parse(url.toExternalForm());
-                document = parser.getDocument();
+                DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+                factory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
+                factory.setFeature("http://xml.org/sax/features/external-general-entities", false);
+                factory.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
+                factory.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
+                factory.setXIncludeAware(false);
+                factory.setExpandEntityReferences(false);
+                DocumentBuilder builder = factory.newDocumentBuilder();
+                document = builder.parse(url.openStream());
+                document.getDocumentElement().normalize();
             } else {
                 Debug.logError("Unable to locate HTML document " + str, MODULE);
             }
-        } catch (IOException | SAXException e) {
+        } catch (IOException | ParserConfigurationException | SAXException e) {
             Debug.logError(e, "Error while reading HTML document " + str, MODULE);
         }
         return document;
@@ -436,6 +445,9 @@ public class UelFunctions {
             sb.append("</xsl:template>\n</xsl:stylesheet>\n");
             ByteArrayInputStream bis = new ByteArrayInputStream(sb.toString().getBytes(StandardCharsets.UTF_8));
             TransformerFactory transformerFactory = TransformerFactory.newInstance();
+            transformerFactory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
+            transformerFactory.setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, "");
+            transformerFactory.setAttribute(XMLConstants.ACCESS_EXTERNAL_STYLESHEET, "");
             try (ByteArrayOutputStream os = new ByteArrayOutputStream();) {
                 UtilXml.transformDomDocument(transformerFactory.newTransformer(new StreamSource(bis)), node, os);
                 return os.toString();
